@@ -85,7 +85,7 @@ const ProjectsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="shrink-0 w-1/4 md:w-1/12 mx-8 lg:mx-12 "
+                className="shrink-0 w-1/5 md:w-1/12 lg:mx-12 "
               >
                 <Link
                   href={logo.url}
