@@ -22,7 +22,7 @@ const OwnersSection = () => {
             </div>
             {/* Headline */}
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl lg:text-6xl font-semibold leading-16">
+              <h2 className="text-3xl md:text-4xl lg:text-6xl font-semibold lg:leading-16">
                 DIGITAL VARS
                 <br />
                 <span className="text-accent">MARKETING AGENCY</span>
@@ -100,7 +100,7 @@ const OwnersSection = () => {
                 <div className="text-center lg:text-right pr-4">
                   <h4 className="font-bold text-xl text-gray-900 ">Faiz Ali</h4>
                   <p className="text-sm text-pink-600 font-medium">
-                    Founder & Tech Lead.
+                    Co-Founder & Tech Lead.
                   </p>
                 </div>
               </div>

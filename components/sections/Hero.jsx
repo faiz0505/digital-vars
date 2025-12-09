@@ -15,7 +15,7 @@ const Hero = () => {
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl lg:text-6xl font-semibold leading-16">
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-semibold lg:leading-16">
             Big ideas, smart strategies,
             <br className="hidden lg:block" /> and endless creativity to{" "}
             {/* <br className="hidden lg:block" /> */}

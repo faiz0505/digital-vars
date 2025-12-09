@@ -60,7 +60,7 @@ const coreServices = [
 
 const ServicesSection = () => {
   return (
-    <section className="container mx-auto px-4 lg:px-12 py-20" id="services">
+    <section className="container mx-auto px-4 lg:px-12 py-10" id="services">
       {/* Header */}
       <MotionDiv
         initial={{ opacity: 0, y: 40 }}
@@ -110,7 +110,7 @@ const ServicesSection = () => {
             </div>
 
             {/* Description */}
-            <p className="text-sm opacity-85 leading-relaxed">
+            <p className="text-sm opacity-85 lg:leading-relaxed">
               {service.description}
             </p>
 

@@ -1,6 +1,21 @@
+"use client";
+
 import { Briefcase } from "lucide-react";
 import { MotionDiv } from "../common/motion";
 import Link from "next/link";
+import {
+  motion,
+  useAnimationFrame,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+
+// Utility to wrap a number between a range
+const wrap = (min, max, v) => {
+  const rangeSize = max - min;
+  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
+};
 
 const ProjectsSection = () => {
   const clientLogos = [
@@ -47,8 +62,38 @@ const ProjectsSection = () => {
     },
   ];
 
+  // Logic to infinite scroll
+  const [width, setWidth] = useState(0);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      // Divided by 3 because we triplicated the array
+      const measure = () => setWidth(ref.current.scrollWidth / 3);
+      measure();
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+  }, []);
+
+  const baseX = useMotionValue(0);
+  const x = useTransform(baseX, (v) => `${wrap(-width, 0, v)}px`);
+
+  useAnimationFrame((t, delta) => {
+    if (width > 0) {
+      // Adjust speed here. lower is slower. 
+      // delta is time in ms since last frame.
+      // -0.05 px per ms approx
+      let moveBy = -0.5 * (delta / 16.6);
+      baseX.set(baseX.get() + moveBy);
+    }
+  });
+
   return (
-    <section className="py-12 lg:py-20 bg-primary" id="projects">
+    <section
+      className="py-12 lg:py-20 bg-primary overflow-hidden"
+      id="projects"
+    >
       <div className="container mx-auto px-4 lg:px-12 space-y-12">
         {/* Heading */}
         <MotionDiv
@@ -61,11 +106,11 @@ const ProjectsSection = () => {
           <div className="inline-flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-full border border-purple-300">
             <Briefcase className="w-4 h-4 text-purple-700" />
             <span className="text-sm font-medium text-gray-800">
-              Our Clientele
+              Our Clients
             </span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight text-white">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold lg:leading-tight text-white">
             Trusted by Leading <span className="text-accent">Brands</span>
           </h2>
 
@@ -76,38 +121,54 @@ const ProjectsSection = () => {
         </MotionDiv>
 
         {/* Marquee */}
-        <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-          <div className="flex w-[200%] md:w-[150%] animate-marquee">
-            {[...clientLogos, ...clientLogos].map((logo, index) => (
-              <MotionDiv
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="shrink-0 w-1/5 md:w-1/12 lg:mx-12 "
-              >
-                <Link
-                  href={logo.url}
-                  target="_blank"
-                  className="group flex flex-col items-center justify-center p-4 md:p-6 cursor-pointer space-y-2 "
-                  aria-label={`Visit ${logo.name} website`}
-                >
-                  <img
-                    src={logo.image}
-                    alt={logo.name}
-                    className="w-14 h-14 md:w-20 md:h-20 object-contain"
-                  />
-                  <span className="text-xs md:text-sm font-medium text-gray-300 group-hover:text-purple-700 whitespace-nowrap">
-                    {logo.name}
-                  </span>
-                </Link>
-              </MotionDiv>
-            ))}
-          </div>
+        <div className="relative w-full mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <motion.div
+            className="flex gap-4 cursor-grab active:cursor-grabbing"
+            ref={ref}
+            style={{ x }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            onDrag={(event, info) => {
+              // Add drag delta to base X to sync movement
+              // Dividing by a factor can smooth it or change sensitivity if needed
+              baseX.set(baseX.get() + info.delta.x);
+            }}
+          >
+            {/* Render enough copies to fill the screen + buffer for infinite loop */}
+            {[...clientLogos, ...clientLogos, ...clientLogos].map(
+              (logo, index) => (
+                <Card key={index} logo={logo} />
+              )
+            )}
+          </motion.div>
         </div>
       </div>
     </section>
+  );
+};
+
+// Extracted Card for cleaner code
+const Card = ({ logo }) => {
+  return (
+    <div className="shrink-0 w-[200px] md:w-[250px] flex items-center justify-center">
+      <Link
+        href={logo.url}
+        target="_blank"
+        className="group flex flex-col items-center justify-center p-6 rounded-xl transition-all duration-300 hover:bg-white/5 w-full h-full"
+        aria-label={`Visit ${logo.name} website`}
+      >
+        <div className="h-20 w-auto flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
+          <img
+            src={logo.image}
+            alt={logo.name}
+            className="max-h-full max-w-full object-contain   opacity-70 group-hover:opacity-100 transition-all duration-300"
+          />
+        </div>
+        <span className="text-sm font-medium text-white/50 group-hover:text-white transition-colors">
+          {logo.name}
+        </span>
+      </Link>
+    </div>
   );
 };
 
